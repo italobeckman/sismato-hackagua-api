@@ -18,13 +18,13 @@ public class GeoResource {
     @Inject
     FeatureService featureService;
 
-    @POST
-    public Object test(FeatureCollectionDTO featureCollectionDTO) {
-        return featureCollectionService.save(featureCollectionDTO);
-    }
+    // @POST
+    // public Object test(FeatureCollectionDTO featureCollectionDTO) {
+    //     return featureCollectionService.save(featureCollectionDTO);
+    // }
 
-    @GET
-    public FeatureCollectionDTO getFeatureCollection() {
-        return FeatureCollectionDTO.toDTO(featureService.getAllFeatures());
-    }
+    // @GET
+    // public FeatureCollectionDTO getFeatureCollection() {
+    //     return FeatureCollectionDTO.toDTO(featureService.getAllFeatures());
+    // }
 }

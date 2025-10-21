@@ -1,12 +1,21 @@
 package br.unitins.hackathon.sismato.entity.sisagua;
 
 import br.unitins.hackathon.sismato.entity.geo.DefaultEntity;
+import br.unitins.hackathon.sismato.entity.geo.Municipio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToMany;
 
 @MappedSuperclass
 public abstract class BaseControle extends DefaultEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "municipio_entity")
+    private Municipio municipioEntity;
+
     @Column(name = "regiao_geografica")
     private String regiaoGeografica;
 

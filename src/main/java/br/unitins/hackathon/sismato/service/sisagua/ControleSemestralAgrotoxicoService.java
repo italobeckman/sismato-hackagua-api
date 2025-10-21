@@ -1,4 +1,4 @@
-package br.unitins.hackathon.sismato.service;
+package br.unitins.hackathon.sismato.service.sisagua;
 
 import br.unitins.hackathon.sismato.entity.sisagua.ControleSemestralAgrotoxico;
 import br.unitins.hackathon.sismato.repository.sisagua.ControleSemestralAgrotoxicoRepository;

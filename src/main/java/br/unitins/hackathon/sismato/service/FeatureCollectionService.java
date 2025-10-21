@@ -9,14 +9,14 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class FeatureCollectionService {
 
-    @Inject
-    FeatureService featureService;
+    // @Inject
+    // FeatureService featureService;
 
-    public Feature save(FeatureCollectionDTO featureCollectionDTO) {
-        for(FeatureDTO featureDTO : featureCollectionDTO.features()) {
-            featureService.save(featureDTO);
-        }
+    // public Feature save(FeatureCollectionDTO featureCollectionDTO) {
+    //     for(FeatureDTO featureDTO : featureCollectionDTO.features()) {
+    //         featureService.save(featureDTO);
+    //     }
 
-        return null;
-    }
+    //     return null;
+    // }
 }

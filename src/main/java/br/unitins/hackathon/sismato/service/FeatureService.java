@@ -19,21 +19,21 @@ public class FeatureService {
     MunicipioService municipioService;
 
     @Transactional
-    public Feature save(FeatureDTO featureDTO) {
-        Feature feature = FeatureDTO.toEntity(featureDTO);
+    // public Feature save(FeatureDTO featureDTO) {
+    //     Feature feature = FeatureDTO.toEntity(featureDTO);
 
-        Municipio municipio = municipioService.findById(featureDTO.properties().id());
+    //     Municipio municipio = municipioService.findById(featureDTO.properties().c());
 
-        if(municipio == null) {
-            municipio = municipioService.save(featureDTO.properties());
-        }
+    //     if(municipio == null) {
+    //         municipio = municipioService.save(featureDTO.properties());
+    //     }
 
-        feature.setProperties(municipio);
+    //     feature.setProperties(municipio);
 
-        featureRepository.persist(feature);
+    //     featureRepository.persist(feature);
 
-        return feature;
-    }
+    //     return feature;
+    // }
 
     public List<Feature> getAllFeatures() {
         return featureRepository.findAll().list();
