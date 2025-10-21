@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public record FeatureDTO(
         String type,
-        PropertiesDTO properties,
+        MunicipioDTO properties,
         JsonNode geometry
 ) {
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -15,7 +15,7 @@ public record FeatureDTO(
             String geoJsonStr = objectMapper.writeValueAsString(featureDTO.geometry);
             Feature feature = new Feature();
             feature.setType(featureDTO.type);
-            feature.setProperties(PropertiesDTO.toEntity(featureDTO.properties));
+            feature.setProperties(MunicipioDTO.toEntity(featureDTO.properties));
             feature.setGeometry(geoJsonStr);
 
             return feature;
@@ -36,7 +36,7 @@ public record FeatureDTO(
 
         return new FeatureDTO(
                 feature.getType(),
-                PropertiesDTO.toDTO(feature.getProperties()),
+                MunicipioDTO.toDTO(feature.getProperties()),
                 json
         );
     }

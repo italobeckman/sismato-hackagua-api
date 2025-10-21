@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 public class Feature extends DefaultEntity {
     private String type;
     @ManyToOne
-    private Properties properties;
+    private Municipio municipio;
 
     @Column(columnDefinition = "TEXT")
     private String geometry;
@@ -21,12 +21,12 @@ public class Feature extends DefaultEntity {
         this.type = type;
     }
 
-    public Properties getProperties() {
-        return properties;
+    public Municipio getProperties() {
+        return municipio;
     }
 
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    public void setProperties(Municipio municipio) {
+        this.municipio = municipio;
     }
 
     public String getGeometry() {

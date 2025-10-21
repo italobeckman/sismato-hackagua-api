@@ -2,7 +2,7 @@ package br.unitins.hackathon.sismato.service;
 
 import br.unitins.hackathon.sismato.dto.FeatureDTO;
 import br.unitins.hackathon.sismato.entity.geo.Feature;
-import br.unitins.hackathon.sismato.entity.geo.Properties;
+import br.unitins.hackathon.sismato.entity.geo.Municipio;
 import br.unitins.hackathon.sismato.repository.FeatureRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -16,19 +16,19 @@ public class FeatureService {
     FeatureRepository featureRepository;
 
     @Inject
-    PropertiesService propertiesService;
+    MunicipioService municipioService;
 
     @Transactional
     public Feature save(FeatureDTO featureDTO) {
         Feature feature = FeatureDTO.toEntity(featureDTO);
 
-        Properties properties = propertiesService.findById(featureDTO.properties().id());
+        Municipio municipio = municipioService.findById(featureDTO.properties().id());
 
-        if(properties == null) {
-            properties = propertiesService.save(featureDTO.properties());
+        if(municipio == null) {
+            municipio = municipioService.save(featureDTO.properties());
         }
 
-        feature.setProperties(properties);
+        feature.setProperties(municipio);
 
         featureRepository.persist(feature);
 
