@@ -1,0 +1,35 @@
+# Usa a imagem base OpenJDK 21 do UBI 9
+FROM registry.access.redhat.com/ubi9/openjdk-21:1.23
+
+USER 0
+
+# Define o diretório de trabalho
+WORKDIR /workspace
+
+# Define o local do repositório Maven como variável de ambiente
+ENV MAVEN_REPOSITORY=/root/.m2/repository
+# Heap do JVM para Maven/quarkus:dev dentro do container
+ENV JAVA_TOOL_OPTIONS="-Xms512m -Xmx5g"
+
+# Copia os arquivos necessários para o pré-cache de dependências
+COPY .mvn/ .mvn/
+COPY mvnw .
+COPY pom.xml .
+
+## Instalação de Ferramentas de Sistema Ausentes
+# Instala tar e gzip
+RUN microdnf install -y tar gzip \
+    && microdnf clean all
+
+## Pré-cache de Dependências (Build Stage)
+RUN chmod +x mvnw \
+    && mkdir -p ${MAVEN_REPOSITORY} \
+    && ./mvnw -B -q -DskipTests dependency:go-offline --no-transfer-progress -Dmaven.repo.local=${MAVEN_REPOSITORY}
+
+## Configuração de Execução
+
+# Expõe as portas para a aplicação (8080)
+EXPOSE 8080
+
+# Comando de Execução (Runtime)
+CMD ["/bin/sh", "-lc", "tr -d '\r' < mvnw > /tmp/mvnw && mv /tmp/mvnw mvnw && chmod +x mvnw && ./mvnw -B quarkus:dev -Dquarkus.http.host=0.0.0.0 -Dmaven.repo.local=${MAVEN_REPOSITORY}"]
