@@ -9,6 +9,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class ControleSemestralRadioatividadeRepository implements PanacheRepository<ControleSemestralRadioatividade> {
 
     public PanacheQuery<ControleSemestralRadioatividade> findByMunicipio(Long codigoMunicipio){
-        return find("municipioEntity.codigo", codigoMunicipio);
+         return find("municipioCod.codigo", codigoMunicipio);
     }
 }

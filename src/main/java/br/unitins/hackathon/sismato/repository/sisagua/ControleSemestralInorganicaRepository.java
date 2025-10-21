@@ -15,6 +15,6 @@ import java.util.List;
 public class ControleSemestralInorganicaRepository implements PanacheRepository<ControleSemestralInorganica> {
 
    public PanacheQuery<ControleSemestralInorganica> findByMunicipio(Long codigoMunicipio){
-        return find("municipioEntity.codigo", codigoMunicipio);
+        return find("municipioCod.codigo", codigoMunicipio);
     }
 }

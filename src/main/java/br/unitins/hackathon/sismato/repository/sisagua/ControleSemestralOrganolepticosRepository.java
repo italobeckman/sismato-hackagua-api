@@ -8,7 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ControleSemestralOrganolepticosRepository implements PanacheRepository<ControleSemestralOrganolepticos> {
 
-    public PanacheQuery<ControleSemestralOrganolepticos> findByMunicipio(Long codigoMunicipio){
-        return find("municipioEntity.codigo", codigoMunicipio);
+    public PanacheQuery<ControleSemestralOrganolepticos> findByMunicipio(Long codigoMunicipio) {
+        return find("municipioCod.codigo", codigoMunicipio);
     }
 }

@@ -9,6 +9,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class ControleSemestralOutrosRepository implements PanacheRepository<ControleSemestralOutros> {
 
     public PanacheQuery<ControleSemestralOutros> findByMunicipio(Long codigoMunicipio){
-        return find("municipioEntity.codigo", codigoMunicipio);
+        return find("municipioCod.codigo", codigoMunicipio);
     }
 }

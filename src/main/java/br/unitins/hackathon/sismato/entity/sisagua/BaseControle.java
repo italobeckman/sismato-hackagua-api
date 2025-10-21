@@ -13,8 +13,8 @@ import jakarta.persistence.OneToMany;
 public abstract class BaseControle extends DefaultEntity {
 
     @ManyToOne
-    @JoinColumn(name = "municipio_entity")
-    private Municipio municipioEntity;
+    @JoinColumn(name = "ibge_code")
+    private Municipio municipioCod;
 
     @Column(name = "regiao_geografica")
     private String regiaoGeografica;
