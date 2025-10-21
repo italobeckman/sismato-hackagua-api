@@ -1,6 +1,5 @@
-package br.unitins.hackathon.sismato.entity.geo;
+package br.unitins.hackathon.sismato.entity.sisagua;
 
-import br.unitins.hackathon.sismato.entity.sisagua.BaseControle;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 

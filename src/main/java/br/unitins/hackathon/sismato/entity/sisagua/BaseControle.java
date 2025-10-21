@@ -1,11 +1,12 @@
 package br.unitins.hackathon.sismato.entity.sisagua;
 
+import br.unitins.hackathon.sismato.entity.geo.DefaultEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class BaseControle {
+public abstract class BaseControle extends DefaultEntity {
     @Column(name = "regiao_geografica")
     private String regiaoGeografica;
 
@@ -81,7 +82,6 @@ public abstract class BaseControle {
     @Column(name = "grupo_parametros")
     private String grupoParametros;
 
-    @Id
     @Column(name = "parametro")
     private String parametro;
 

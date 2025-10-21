@@ -1,7 +1,7 @@
 package br.unitins.hackathon.sismato.service;
 
 import br.unitins.hackathon.sismato.entity.sisagua.ControleSemestralAgrotoxico;
-import br.unitins.hackathon.sismato.repository.ControleSemestralAgrotoxicoRepository;
+import br.unitins.hackathon.sismato.repository.sisagua.ControleSemestralAgrotoxicoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

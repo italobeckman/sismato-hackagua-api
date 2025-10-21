@@ -1,4 +1,4 @@
-package br.unitins.hackathon.sismato.repository;
+package br.unitins.hackathon.sismato.repository.sisagua;
 
 import br.unitins.hackathon.sismato.entity.sisagua.ControleSemestralAgrotoxico;
 import jakarta.enterprise.context.ApplicationScoped;
