@@ -42,9 +42,11 @@ public class ControleSemestralResource {
     ControleSemestralRadioatividadeService controleSemestralRadioatividadeService;
 
     @GET
-    @Path("/{sigla}")
-    public List<ControleSemestralAgrotoxico> findByNomeInstituicao(@PathParam("sigla") String sigla) {
-        return controleSemestralAgrotoxicoService.findBySiglaInsitituicao(sigla);
+    @Path("agrotoxico/{codMunicipio}")
+    public List<ControleSemestralAgrotoxico> findByNomeInstituicao(@PathParam("codMunicipio") Long codMunicipio, @QueryParam("page")
+            @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+        return controleSemestralAgrotoxicoService.findByCodigoMunicipio(codMunicipio, page, pageSize);
     }
 
     @GET

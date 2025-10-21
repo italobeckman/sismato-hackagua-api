@@ -6,9 +6,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ControleSemestralOutrosRepository implements PanacheRepository<ControleSemestralOutros> {
+public class ControleSemestralOutrosRepository implements BaseControleRepository<ControleSemestralOutros> {
 
-    public PanacheQuery<ControleSemestralOutros> findByMunicipio(Long codigoMunicipio){
-        return find("municipioCod.codigo", codigoMunicipio);
-    }
 }

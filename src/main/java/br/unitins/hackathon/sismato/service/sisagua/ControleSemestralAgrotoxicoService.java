@@ -8,11 +8,11 @@ import jakarta.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
-public class ControleSemestralAgrotoxicoService {
+public class ControleSemestralAgrotoxicoService{
     @Inject
     ControleSemestralAgrotoxicoRepository controleSemestralAgrotoxicoRepository;
 
-    public List<ControleSemestralAgrotoxico> findBySiglaInsitituicao(String sigla) {
-        return controleSemestralAgrotoxicoRepository.findBySiglaInstituicao(sigla);
+    public List<ControleSemestralAgrotoxico> findByCodigoMunicipio(Long codigoMunicipio, int page, int pageSize) {
+        return controleSemestralAgrotoxicoRepository.findByMunicipio(codigoMunicipio).page(page, pageSize).list();
     }
 }

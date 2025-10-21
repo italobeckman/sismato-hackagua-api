@@ -8,13 +8,6 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
-public class ControleSemestralAgrotoxicoRepository {
-    @Inject
-    EntityManager em;
-
-    public List<ControleSemestralAgrotoxico> findBySiglaInstituicao(String sigla) {
-        return em.createQuery("SELECT c FROM ControleSemestralAgrotoxico c WHERE siglaInstituicao like :sigla", ControleSemestralAgrotoxico.class)
-                .setParameter("sigla", "%" + sigla + "%")
-                .getResultList();
-    }
+public class ControleSemestralAgrotoxicoRepository implements BaseControleRepository<ControleSemestralAgrotoxico> {
+    
 }

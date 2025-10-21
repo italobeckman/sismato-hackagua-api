@@ -12,9 +12,6 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 @ApplicationScoped
-public class ControleSemestralInorganicaRepository implements PanacheRepository<ControleSemestralInorganica> {
+public class ControleSemestralInorganicaRepository implements BaseControleRepository<ControleSemestralInorganica> {
 
-   public PanacheQuery<ControleSemestralInorganica> findByMunicipio(Long codigoMunicipio){
-        return find("municipioCod.codigo", codigoMunicipio);
-    }
 }
