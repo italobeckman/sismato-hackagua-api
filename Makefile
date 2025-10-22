@@ -4,7 +4,15 @@ COMPOSE_DEV = docker-compose -f docker-compose.dev.yml
 COMPOSE_PROD = docker-compose -f docker-compose.yml
 DUMP_FILE = src/main/resources/sismato.dump
 
-.PHONY: help dev dev-d dev-down dev-logs dev-rebuild db db-down db-restore-dev prod prod-d prod-down prod-logs prod-rebuild db-restore-prod swagger openapi openapi-dev clean
+# Timestamp para nomear dumps (cross-platform)
+ifeq ($(OS),Windows_NT)
+TIMESTAMP := $(shell powershell -NoProfile -Command "Get-Date -Format 'yyyyMMdd_HHmmss'")
+else
+TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+endif
+DUMP_NAME = sismato-$(TIMESTAMP).dump
+
+.PHONY: help dev dev-d dev-down dev-logs dev-rebuild db db-down db-dump-dev db-restore-dev prod prod-d prod-down prod-logs prod-rebuild db-restore-prod swagger openapi openapi-dev clean
 
 help:
 	@echo "Targets:"
@@ -96,3 +104,13 @@ db-restore-dev:
 	docker cp $(DUMP_FILE) postgres_dev:/tmp/sismato.dump
 	docker exec postgres_dev pg_restore -h localhost -U root -d sismato -c -v /tmp/sismato.dump
 	$(COMPOSE_DEV) stop db
+
+# Dump database (dev)
+db-dump-dev:
+	$(COMPOSE_DEV) up -d db
+	# Wait for Postgres to be ready
+	docker exec postgres_dev bash -lc "until pg_isready -h localhost -U root -d sismato; do sleep 1; done"
+	# Gera dump custom (-Fc) dentro do container com nome timestampado
+	docker exec postgres_dev pg_dump -h localhost -U root -d sismato -Fc -f /tmp/$(DUMP_NAME)
+	# Copia para a pasta de resources no host
+	docker cp postgres_dev:/tmp/$(DUMP_NAME) src/main/resources/$(DUMP_NAME)

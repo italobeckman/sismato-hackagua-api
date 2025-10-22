@@ -62,7 +62,9 @@ public class MensalAmostras extends DefaultEntity {
     @Column(name = "perc_cumprimento_amostras_obrigatorias", precision = 38, scale = 2)
     public BigDecimal percCumprimentoAmostrasObrigatorias;
 
- 
+    @Column(name = "cod_mun_ibge", length = 10)
+    public String codMunIbge;
+
     public String getUf() {
         return uf;
     }
@@ -197,5 +199,13 @@ public class MensalAmostras extends DefaultEntity {
 
     public void setPercCumprimentoAmostrasObrigatorias(BigDecimal percCumprimentoAmostrasObrigatorias) {
         this.percCumprimentoAmostrasObrigatorias = percCumprimentoAmostrasObrigatorias;
+    }
+
+    public String getCodMunIbge() {
+        return codMunIbge;
+    }
+    
+    public void setCodMunIbge(String codMunIbge) {
+        this.codMunIbge = codMunIbge;
     }
 }
