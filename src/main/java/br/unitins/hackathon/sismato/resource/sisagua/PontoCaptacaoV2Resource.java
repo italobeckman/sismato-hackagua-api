@@ -1,5 +1,6 @@
 package br.unitins.hackathon.sismato.resource.sisagua;
 
+import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoMapaDTO;
 import br.unitins.hackathon.sismato.service.sisagua.PontoCaptacaoV2Service;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -23,16 +24,16 @@ public class PontoCaptacaoV2Resource {
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
         var items = service.findByFilters(codigoIbge, ano, municipio, tpCaptacao, page, pageSize);
-        return Response.ok(items).build();
+        return Response.ok(items.stream().map(PontoCaptacaoMapaDTO::toDto).toList()).build();
     }
 
     @GET
-    @Path("/{codigoMunicipio}")
+    @Path("{codigoMunicipio}")
     public Response getByCodigoMunicipio(
             @PathParam("codigoMunicipio") Integer codigoMunicipio,
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return Response.ok(service.findByCodigoMunicipio(codigoMunicipio, page, pageSize)).build();
+            @QueryParam("pageSize") @DefaultValue("300") int pageSize) {
+        return Response.ok(service.findByCodigoMunicipio(codigoMunicipio, page, pageSize).stream().map(PontoCaptacaoMapaDTO::toDto).toList()).build();
     }
 
     @GET
