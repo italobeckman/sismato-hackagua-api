@@ -32,8 +32,17 @@ public class PontoCaptacaoV2Resource {
     public Response getByCodigoMunicipio(
             @PathParam("codigoMunicipio") Integer codigoMunicipio,
             @QueryParam("page") @DefaultValue("0") int page,
-            @QueryParam("pageSize") @DefaultValue("300") int pageSize) {
-        return Response.ok(service.findByCodigoMunicipio(codigoMunicipio, page, pageSize).stream().map(PontoCaptacaoMapaDTO::toDto).toList()).build();
+            @QueryParam("pageSize") @DefaultValue("300") int pageSize,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano) {
+        return Response.ok(service.findByCodigoMunicipio(codigoMunicipio, ano, page, pageSize).stream()
+                .map(PontoCaptacaoMapaDTO::toDto).toList()).build();
+    }
+
+    @GET
+    @Path("/detalhes/{codigoIbge}")
+    public Response getDetalhesPorCodigoIbge(@PathParam("codigoIbge") Integer codigoIbge) {
+        var detalhes = service.getDetalhesPorCodigoIbge(codigoIbge);
+        return Response.ok(detalhes).build();
     }
 
     @GET

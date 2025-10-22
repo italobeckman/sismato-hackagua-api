@@ -1,5 +1,6 @@
 package br.unitins.hackathon.sismato.service.sisagua;
 
+import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import br.unitins.hackathon.sismato.repository.sisagua.PontoCaptacaoV2Repository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,8 +14,8 @@ public class PontoCaptacaoV2Service {
     @Inject
     PontoCaptacaoV2Repository repository;
 
-    public List<PontoCaptacaoV2> findByCodigoMunicipio(Integer codigoMunicipio, int page, int pageSize) {
-        var q = repository.findByMunicipioCodigo(codigoMunicipio);
+    public List<PontoCaptacaoV2> findByCodigoMunicipio(Integer codigoMunicipio, Integer ano, int page, int pageSize) {
+        var q = repository.findByMunicipioCodigo(codigoMunicipio, ano);
         q.page(page, pageSize);
         q.withHint("org.hibernate.fetchSize", Math.min(pageSize, 1000));
         return q.list();
@@ -36,6 +37,11 @@ public class PontoCaptacaoV2Service {
         q.page(page, pageSize);
         q.withHint("org.hibernate.fetchSize", Math.min(pageSize, 1000));
         return q.list();
+    }
+
+    public List<PontoCaptacaoDetalhesDTO> getDetalhesPorCodigoIbge(Integer codigoIbge) {
+        PontoCaptacaoDetalhesDTO detalhes = repository.getDetalhesPorCodigoIbge(codigoIbge);
+        return List.of(detalhes);
     }
 
     public long count() {

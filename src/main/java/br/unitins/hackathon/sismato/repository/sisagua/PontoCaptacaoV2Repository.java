@@ -1,5 +1,6 @@
 package br.unitins.hackathon.sismato.repository.sisagua;
 
+import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -11,8 +12,8 @@ import java.util.Map;
 @ApplicationScoped
 public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptacaoV2> {
 
-    public PanacheQuery<PontoCaptacaoV2> findByMunicipioCodigo(Integer codigoIbge) {
-        return find("codigoIbge", codigoIbge);
+    public PanacheQuery<PontoCaptacaoV2> findByMunicipioCodigo(Integer codigoIbge, Integer ano) {
+        return find("codigoIbge = :codigoIbge and ano = :ano", Map.of("codigoIbge", codigoIbge, "ano", ano));
     }
 
     public PanacheQuery<PontoCaptacaoV2> findByMunicipioNome(String municipio) {
@@ -52,5 +53,24 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
         }
 
         return find(query.toString(), params);
+    }
+
+
+    public PontoCaptacaoDetalhesDTO getDetalhesPorCodigoIbge(Integer codigoIbge) {
+        return getEntityManager().createQuery(
+            "SELECT NEW br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO(" +
+            "    COUNT(p), " +
+            "    COALESCE(SUM(p.nuVazaoCaptada), 0), " +
+            "    COALESCE(SUM(CASE WHEN p.tipoCaptacao = 'SUPERFICIAL' THEN 1 ELSE 0 END), 0), " +
+            "    COALESCE(SUM(CASE WHEN p.tipoCaptacao = 'SUBTERRANEO' THEN 1 ELSE 0 END), 0), " +
+            "    COALESCE(SUM(CASE WHEN p.stOutorga = 'S' THEN 1 ELSE 0 END), 0), " +
+            "    COALESCE(SUM(CASE WHEN p.stOutorga = 'N' THEN 1 ELSE 0 END), 0), " +
+            "    COALESCE(SUM(CASE WHEN p.stOutorga IS NULL OR p.stOutorga NOT IN ('S', 'N') THEN 1 ELSE 0 END), 0) " +
+            ") " +
+            "FROM PontoCaptacaoV2 p " +
+            "WHERE p.codigoIbge = :codigoIbge", 
+            PontoCaptacaoDetalhesDTO.class)
+        .setParameter("codigoIbge", codigoIbge)
+        .getSingleResult();
     }
 }
