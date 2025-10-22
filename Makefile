@@ -91,6 +91,8 @@ db-restore-prod:
 # Restore database from dump (dev)
 db-restore-dev:
 	$(COMPOSE_DEV) up -d db
+	# Wait for Postgres to be ready
+	docker exec postgres_dev bash -lc "until pg_isready -h localhost -U root -d sismato; do sleep 1; done"
 	docker cp $(DUMP_FILE) postgres_dev:/tmp/sismato.dump
-	docker exec postgres_dev pg_restore -U root -d sismato -c -v /tmp/sismato.dump
+	docker exec postgres_dev pg_restore -h localhost -U root -d sismato -c -v /tmp/sismato.dump
 	$(COMPOSE_DEV) stop db
