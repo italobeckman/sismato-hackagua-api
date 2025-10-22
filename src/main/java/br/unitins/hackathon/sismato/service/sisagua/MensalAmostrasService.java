@@ -3,12 +3,16 @@ package br.unitins.hackathon.sismato.service.sisagua;
 import java.util.Arrays;
 import java.util.List;
 
-import br.unitins.hackathon.sismato.entity.sisagua.MensalAmostras;
+import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoQualidadeMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.MensalAmostrasResumoPorAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.ParametroCriticoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.ParametrosCriticosMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.QualidadeAguaMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
+import br.unitins.hackathon.sismato.entity.sisagua.MensalAmostras;
 import br.unitins.hackathon.sismato.repository.sisagua.MensalAmostrasRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -94,6 +98,34 @@ public class MensalAmostrasService {
 
     public List<ParametroCriticoDTO> topParametrosAnoAnteriorTO(int limit) {
         return repository.topParametrosAnoAnteriorTO(limit);
+    }
+
+    /**
+     * Retorna a qualidade da água por município específico em um ano
+     */
+    public QualidadeAguaMunicipioDTO qualidadeAguaPorMunicipio(String codIbge, Integer ano) {
+        return repository.qualidadeAguaPorMunicipio(codIbge, ano);
+    }
+
+    /**
+     * Retorna a evolução histórica da qualidade da água por município
+     */
+    public List<EvolucaoQualidadeMunicipioDTO> evolucaoQualidadePorMunicipio(String codIbge) {
+        return repository.evolucaoQualidadePorMunicipio(codIbge);
+    }
+
+    /**
+     * Retorna os parâmetros mais críticos por município em um ano
+     */
+    public List<ParametrosCriticosMunicipioDTO> parametrosCriticosPorMunicipio(String codIbge, Integer ano, int limit) {
+        return repository.parametrosCriticosPorMunicipio(codIbge, ano, limit);
+    }
+
+    /**
+     * Retorna comparação entre municípios por região
+     */
+    public List<ComparacaoMunicipiosDTO> comparacaoMunicipiosPorRegiao(String regiao, Integer ano, int minAmostras, int limit) {
+        return repository.comparacaoMunicipiosPorRegiao(regiao, ano, minAmostras, limit);
     }
 
 }

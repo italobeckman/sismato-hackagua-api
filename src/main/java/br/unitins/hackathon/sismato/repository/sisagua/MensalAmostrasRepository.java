@@ -1,11 +1,15 @@
 package br.unitins.hackathon.sismato.repository.sisagua;
 
 import br.unitins.hackathon.sismato.entity.sisagua.MensalAmostras;
+import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoQualidadeMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.MensalAmostrasResumoPorAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.ParametroCriticoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.ParametrosCriticosMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.QualidadeAguaMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -196,4 +200,142 @@ public class MensalAmostrasRepository implements PanacheRepository<MensalAmostra
         )).collect(Collectors.toList());
     }
 
+    /**
+     * Retorna a qualidade da água por município específico em um ano
+     * GRÁFICO: Pizza/Donut - Distribuição de conformidade/inconformidade
+     * INSIGHT: Mostra o status geral da qualidade da água no município
+     */
+    public QualidadeAguaMunicipioDTO qualidadeAguaPorMunicipio(String codIbge, Integer ano) {
+        String sql = "SELECT municipio, cod_mun_ibge, " +
+                "SUM(num_amostras_analisadas) AS total_amostras, " +
+                "SUM(num_amostras_fora_do_padrao) AS amostras_inconformes, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "ROUND((SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)), 2) ELSE 0 END AS percentual_inconformidade, " +
+                "ano " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = 'TO' AND cod_mun_ibge = :codIbge AND ano = :ano " +
+                "GROUP BY municipio, cod_mun_ibge, ano";
+
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("codIbge", codIbge);
+        query.setParameter("ano", ano);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        if (rows.isEmpty()) {
+            return null;
+        }
+
+        Object[] r = rows.get(0);
+        return new QualidadeAguaMunicipioDTO(
+                (String) r[0],
+                r[1] != null ? r[1].toString() : null,
+                ((Number) r[2]).longValue(),
+                ((Number) r[3]).longValue(),
+                ((Number) r[4]).doubleValue(),
+                ((Number) r[5]).intValue()
+        );
+    }
+
+    /**
+     * Retorna a evolução histórica da qualidade da água por município
+     * GRÁFICO: Linha/Área - Evolução temporal da qualidade
+     * INSIGHT: Permite acompanhar tendências de melhoria ou piora na qualidade da água
+     */
+    public List<EvolucaoQualidadeMunicipioDTO> evolucaoQualidadePorMunicipio(String codIbge) {
+        String sql = "SELECT ano, municipio, cod_mun_ibge, " +
+                "SUM(num_amostras_analisadas) AS total_amostras, " +
+                "SUM(num_amostras_fora_do_padrao) AS amostras_inconformes, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "ROUND((SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)), 2) ELSE 0 END AS percentual_inconformidade " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = 'TO' AND cod_mun_ibge = :codIbge AND ano IS NOT NULL " +
+                "GROUP BY ano, municipio, cod_mun_ibge " +
+                "ORDER BY ano ASC";
+
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("codIbge", codIbge);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new EvolucaoQualidadeMunicipioDTO(
+                ((Number) r[0]).intValue(),
+                (String) r[1],
+                r[2] != null ? r[2].toString() : null,
+                ((Number) r[3]).longValue(),
+                ((Number) r[4]).longValue(),
+                ((Number) r[5]).doubleValue()
+        )).collect(Collectors.toList());
+    }
+
+    /**
+     * Retorna os parâmetros mais críticos por município em um ano
+     * GRÁFICO: Barra/Coluna - Ranking de parâmetros problemáticos
+     * INSIGHT: Identifica quais parâmetros específicos estão causando mais inconformidades
+     */
+    public List<ParametrosCriticosMunicipioDTO> parametrosCriticosPorMunicipio(String codIbge, Integer ano, int limit) {
+        String sql = "SELECT parametro, " +
+                "SUM(num_amostras_fora_do_padrao) AS amostras_inconformes, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "ROUND((SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)), 2) ELSE 0 END AS percentual_inconformidade, " +
+                "municipio, cod_mun_ibge " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = 'TO' AND cod_mun_ibge = :codIbge AND ano = :ano AND num_amostras_fora_do_padrao > 0 " +
+                "GROUP BY parametro, municipio, cod_mun_ibge " +
+                "ORDER BY amostras_inconformes DESC";
+
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("codIbge", codIbge);
+        query.setParameter("ano", ano);
+        query.setMaxResults(limit);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new ParametrosCriticosMunicipioDTO(
+                (String) r[0],
+                ((Number) r[1]).longValue(),
+                ((Number) r[2]).doubleValue(),
+                (String) r[3],
+                r[4] != null ? r[4].toString() : null
+        )).collect(Collectors.toList());
+    }
+
+    /**
+     * Retorna comparação entre municípios similares (mesma região/população)
+     * GRÁFICO: Barra Horizontal - Ranking comparativo entre municípios
+     * INSIGHT: Permite benchmarking entre municípios com características similares
+     */
+    public List<ComparacaoMunicipiosDTO> comparacaoMunicipiosPorRegiao(String regiao, Integer ano, int minAmostras, int limit) {
+        String sql = "SELECT municipio, cod_mun_ibge, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "ROUND((SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)), 2) ELSE 0 END AS percentual_inconformidade, " +
+                "SUM(num_amostras_analisadas) AS total_amostras, " +
+                "ROW_NUMBER() OVER (ORDER BY CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "(SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)) ELSE 0 END DESC) AS ranking " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = 'TO' AND ano = :ano AND regiao = :regiao " +
+                "GROUP BY municipio, cod_mun_ibge " +
+                "HAVING SUM(num_amostras_analisadas) >= :minAmostras " +
+                "ORDER BY percentual_inconformidade DESC";
+
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("regiao", regiao);
+        query.setParameter("ano", ano);
+        query.setParameter("minAmostras", minAmostras);
+        query.setMaxResults(limit);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new ComparacaoMunicipiosDTO(
+                (String) r[0],
+                r[1] != null ? r[1].toString() : null,
+                ((Number) r[2]).doubleValue(),
+                ((Number) r[3]).longValue(),
+                ((Number) r[4]).intValue()
+        )).collect(Collectors.toList());
+    }
 }
