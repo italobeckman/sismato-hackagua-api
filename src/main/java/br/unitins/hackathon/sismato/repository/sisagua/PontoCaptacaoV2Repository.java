@@ -1,13 +1,18 @@
 package br.unitins.hackathon.sismato.repository.sisagua;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ApplicationScoped
 public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptacaoV2> {
@@ -55,7 +60,6 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
         return find(query.toString(), params);
     }
 
-
     public PontoCaptacaoDetalhesDTO getDetalhesPorCodigoIbge(Integer codigoIbge, Integer ano) {
         return getEntityManager().createQuery(
             "SELECT NEW br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO(" +
@@ -72,5 +76,106 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
         .setParameter("codigoIbge", codigoIbge)
         .setParameter("ano", ano)
         .getSingleResult();
+    }
+
+    /**
+     * Retorna a evolução histórica das vazões por ano e município (opcional)
+     */
+    public List<EvolucaoVazaoDTO> evolucaoVazoesPorAno(Integer codigoIbge) {
+        StringBuilder sql = new StringBuilder("SELECT nu_ano, " +
+                "AVG(nu_vazao_captada) AS vazao_media, " +
+                "COUNT(*) AS quantidade_pontos " +
+                "FROM public.pontos_de_captacao_sisagua_v2 " +
+                "WHERE sg_uf = 'TO' AND nu_ano IS NOT NULL AND nu_vazao_captada IS NOT NULL");
+
+        if (codigoIbge != null) {
+            sql.append(" AND co_municipio_ibge = :codigoIbge");
+        }
+
+        sql.append(" GROUP BY nu_ano " +
+                "ORDER BY nu_ano ASC");
+
+        var query = getEntityManager().createNativeQuery(sql.toString());
+
+        if (codigoIbge != null) {
+            query.setParameter("codigoIbge", codigoIbge);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new EvolucaoVazaoDTO(
+                ((Number) r[0]).intValue(),
+                (java.math.BigDecimal) r[1],
+                ((Number) r[2]).longValue()
+        )).collect(Collectors.toList());
+    }
+
+    /**
+     * Retorna o total de pontos com outorga SIM ou NÃO por ano e município (opcional)
+     */
+    public List<TotalOutorgaDTO> totalPorOutorga(Integer ano, Integer codigoIbge) {
+        StringBuilder sql = new StringBuilder("SELECT " +
+                "CASE WHEN st_outorga = 'S' THEN 'Sim' " +
+                "WHEN st_outorga = 'N' THEN 'Não' " +
+                "ELSE 'Não informado' END AS status_outorga, " +
+                "COUNT(*) AS total " +
+                "FROM public.pontos_de_captacao_sisagua_v2 " +
+                "WHERE sg_uf = 'TO' AND nu_ano = :ano");
+
+        if (codigoIbge != null) {
+            sql.append(" AND co_municipio_ibge = :codigoIbge");
+        }
+
+        sql.append(" GROUP BY CASE WHEN st_outorga = 'S' THEN 'Sim' " +
+                "WHEN st_outorga = 'N' THEN 'Não' " +
+                "ELSE 'Não informado' END " +
+                "ORDER BY total DESC");
+
+        var query = getEntityManager().createNativeQuery(sql.toString());
+        query.setParameter("ano", ano);
+
+        if (codigoIbge != null) {
+            query.setParameter("codigoIbge", codigoIbge);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new TotalOutorgaDTO(
+                (String) r[0],
+                ((Number) r[1]).longValue()
+        )).collect(Collectors.toList());
+    }
+
+    /**
+     * Retorna a quantidade de pontos por tipo de captação (Subterrâneo/Superficial) por ano e município (opcional)
+     */
+    public List<TipoCaptacaoDTO> quantidadePorTipoCaptacao(Integer ano, Integer codigoIbge) {
+        StringBuilder sql = new StringBuilder("SELECT tp_captacao, COUNT(*) AS quantidade " +
+                "FROM public.pontos_de_captacao_sisagua_v2 " +
+                "WHERE sg_uf = 'TO' AND nu_ano = :ano AND tp_captacao IS NOT NULL");
+
+        if (codigoIbge != null) {
+            sql.append(" AND co_municipio_ibge = :codigoIbge");
+        }
+
+        sql.append(" GROUP BY tp_captacao " +
+                "ORDER BY quantidade DESC");
+
+        var query = getEntityManager().createNativeQuery(sql.toString());
+        query.setParameter("ano", ano);
+
+        if (codigoIbge != null) {
+            query.setParameter("codigoIbge", codigoIbge);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new TipoCaptacaoDTO(
+                (String) r[0],
+                ((Number) r[1]).longValue()
+        )).collect(Collectors.toList());
     }
 }

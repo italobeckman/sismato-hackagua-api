@@ -1,12 +1,15 @@
 package br.unitins.hackathon.sismato.service.sisagua;
 
+import java.util.List;
+
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import br.unitins.hackathon.sismato.repository.sisagua.PontoCaptacaoV2Repository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
-import java.util.List;
 
 @ApplicationScoped
 public class PontoCaptacaoV2Service {
@@ -50,5 +53,26 @@ public class PontoCaptacaoV2Service {
 
     public PontoCaptacaoV2 findById(Long id) {
         return repository.findById(id);
+    }
+
+    /**
+     * Retorna a evolução histórica das vazões por ano e município (opcional)
+     */
+    public List<EvolucaoVazaoDTO> evolucaoVazoesPorAno(Integer codigoIbge) {
+        return repository.evolucaoVazoesPorAno(codigoIbge);
+    }
+
+    /**
+     * Retorna o total de pontos com outorga SIM ou NÃO por ano e município (opcional)
+     */
+    public List<TotalOutorgaDTO> totalPorOutorga(Integer ano, Integer codigoIbge) {
+        return repository.totalPorOutorga(ano, codigoIbge);
+    }
+
+    /**
+     * Retorna a quantidade de pontos por tipo de captação (Subterrâneo/Superficial) por ano e município (opcional)
+     */
+    public List<TipoCaptacaoDTO> quantidadePorTipoCaptacao(Integer ano, Integer codigoIbge) {
+        return repository.quantidadePorTipoCaptacao(ano, codigoIbge);
     }
 }

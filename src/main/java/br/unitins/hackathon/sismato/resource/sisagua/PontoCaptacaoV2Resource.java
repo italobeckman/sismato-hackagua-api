@@ -1,9 +1,20 @@
 package br.unitins.hackathon.sismato.resource.sisagua;
 
+import java.util.List;
+
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoMapaDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
 import br.unitins.hackathon.sismato.service.sisagua.PontoCaptacaoV2Service;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -70,5 +81,62 @@ public class PontoCaptacaoV2Resource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(entity).build();
+    }
+
+    /**
+     * Evolução histórica das vazões por ano e município (opcional).
+     * Retorna a vazão média e quantidade de pontos por ano.
+     *
+     * Query params:
+     * - codIbge: código IBGE do município (opcional, ex.: 1721000)
+     *
+     * Ideal para gráfico de linha/área no Highcharts:
+     * - Eixo X: ano
+     * - Eixo Y: vazaoMedia
+     * - Série adicional: quantidadePontos
+     */
+    @GET
+    @Path("/evolucao-vazoes")
+    public List<EvolucaoVazaoDTO> evolucaoVazoesPorAno(
+            @QueryParam("codIbge") Integer codIbge) {
+        return service.evolucaoVazoesPorAno(codIbge);
+    }
+
+    /**
+     * Total de pontos por status de outorga (Sim, Não, Não informado) por ano e município (opcional).
+     *
+     * Query params:
+     * - ano: ano de referência (ex.: 2025)
+     * - codIbge: código IBGE do município (opcional, ex.: 1721000)
+     *
+     * Ideal para gráfico de pizza/donut no Highcharts:
+     * - name: outorga (Sim/Não/Não informado)
+     * - y: total
+     */
+    @GET
+    @Path("/total-outorga")
+    public List<TotalOutorgaDTO> totalPorOutorga(
+            @QueryParam("ano") @DefaultValue("2025") Integer ano,
+            @QueryParam("codIbge") Integer codIbge) {
+        return service.totalPorOutorga(ano, codIbge);
+    }
+
+    /**
+     * Quantidade de pontos por tipo de captação (Subterrâneo/Superficial) por ano e município (opcional).
+     *
+     * Query params:
+     * - ano: ano de referência (ex.: 2025)
+     * - codIbge: código IBGE do município (opcional, ex.: 1721000)
+     *
+     * Ideal para gráfico de coluna/barra no Highcharts:
+     * - categories: tipoCaptacao
+     * - data: quantidade
+     */
+    @GET
+    @Path("/tipo-captacao")
+    public List<TipoCaptacaoDTO> quantidadePorTipoCaptacao(
+            @QueryParam("ano") @DefaultValue("2025") Integer ano,
+            @QueryParam("codIbge") Integer codIbge) {
+        return service.quantidadePorTipoCaptacao(ano, codIbge);
     }
 }
