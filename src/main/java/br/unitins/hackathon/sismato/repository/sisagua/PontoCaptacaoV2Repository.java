@@ -56,7 +56,7 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
     }
 
 
-    public PontoCaptacaoDetalhesDTO getDetalhesPorCodigoIbge(Integer codigoIbge) {
+    public PontoCaptacaoDetalhesDTO getDetalhesPorCodigoIbge(Integer codigoIbge, Integer ano) {
         return getEntityManager().createQuery(
             "SELECT NEW br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO(" +
             "    COUNT(p), " +
@@ -68,9 +68,9 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
             "    COALESCE(SUM(CASE WHEN p.stOutorga IS NULL OR p.stOutorga NOT IN ('S', 'N') THEN 1 ELSE 0 END), 0) " +
             ") " +
             "FROM PontoCaptacaoV2 p " +
-            "WHERE p.codigoIbge = :codigoIbge", 
-            PontoCaptacaoDetalhesDTO.class)
+            "WHERE p.codigoIbge = :codigoIbge and p.ano = :ano", PontoCaptacaoDetalhesDTO.class)
         .setParameter("codigoIbge", codigoIbge)
+        .setParameter("ano", ano)
         .getSingleResult();
     }
 }

@@ -40,8 +40,8 @@ public class PontoCaptacaoV2Resource {
 
     @GET
     @Path("/detalhes/{codigoIbge}")
-    public Response getDetalhesPorCodigoIbge(@PathParam("codigoIbge") Integer codigoIbge) {
-        var detalhes = service.getDetalhesPorCodigoIbge(codigoIbge);
+    public Response getDetalhesPorCodigoIbge(@PathParam("codigoIbge") Integer codigoIbge, @QueryParam("ano") @DefaultValue("2025") Integer ano) {
+        var detalhes = service.getDetalhesPorCodigoIbge(codigoIbge, ano);
         return Response.ok(detalhes).build();
     }
 
