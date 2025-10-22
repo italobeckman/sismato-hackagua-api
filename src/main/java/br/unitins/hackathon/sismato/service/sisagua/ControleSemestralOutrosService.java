@@ -1,5 +1,6 @@
 package br.unitins.hackathon.sismato.service.sisagua;
 
+import br.unitins.hackathon.sismato.dto.filters.FilterBaseControle;
 import br.unitins.hackathon.sismato.entity.sisagua.ControleSemestralOutros;
 import br.unitins.hackathon.sismato.repository.sisagua.ControleSemestralOutrosRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,5 +16,12 @@ public class ControleSemestralOutrosService {
 
      public List<ControleSemestralOutros> findByCodigoMunicipio(Long codigoMunicipio, int page, int pageSize) {
         return controleSemestralOutrosRepository.findByMunicipio(codigoMunicipio).page(page, pageSize).list();
+    }
+
+    public List<ControleSemestralOutros> findByFiltros(FilterBaseControle filtros, int page, int pageSize) {
+        return controleSemestralOutrosRepository
+                .findByDataFiltros(filtros.codMunicipio(), filtros.anoReferencia(), filtros.semestreColeta(), filtros.mesColeta())
+                .page(page, pageSize)
+                .list();
     }
 }
