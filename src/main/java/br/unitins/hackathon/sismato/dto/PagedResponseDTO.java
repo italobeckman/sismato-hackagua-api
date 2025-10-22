@@ -9,7 +9,7 @@ public record PagedResponseDTO<T>(
         long totalPages,
         List<T> items
 ) {
-    public PagedResponseDTO<T> toDTO(Long count, Long total, Long currentPage, Long totalPages, List<T> items) {
+    public static <T> PagedResponseDTO<T> toDTO(Long count, Long total, Long currentPage, Long totalPages, List<T> items) {
         return new PagedResponseDTO<>(count, total, currentPage, totalPages, items);
     }
 }
