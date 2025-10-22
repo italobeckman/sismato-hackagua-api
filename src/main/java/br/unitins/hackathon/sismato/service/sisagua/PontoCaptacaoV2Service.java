@@ -39,9 +39,9 @@ public class PontoCaptacaoV2Service {
         return q.list();
     }
 
-    public List<PontoCaptacaoDetalhesDTO> getDetalhesPorCodigoIbge(Integer codigoIbge) {
+    public PontoCaptacaoDetalhesDTO getDetalhesPorCodigoIbge(Integer codigoIbge) {
         PontoCaptacaoDetalhesDTO detalhes = repository.getDetalhesPorCodigoIbge(codigoIbge);
-        return List.of(detalhes);
+        return detalhes;
     }
 
     public long count() {
