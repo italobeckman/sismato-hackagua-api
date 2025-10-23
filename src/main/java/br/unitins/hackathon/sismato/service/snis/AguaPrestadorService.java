@@ -2,6 +2,7 @@ package br.unitins.hackathon.sismato.service.snis;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import br.unitins.hackathon.sismato.dto.snis.AtendimentoUrbanoMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.snis.DespesasPrestadorDTO;
@@ -14,6 +15,9 @@ import br.unitins.hackathon.sismato.dto.snis.PerdasDistribuicaoPrestadorDTO;
 import br.unitins.hackathon.sismato.dto.snis.RankingPopulacaoMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.snis.ReceitaOperacionalAnoDTO;
 import br.unitins.hackathon.sismato.dto.snis.VolumeMedioPrestadorDTO;
+import br.unitins.hackathon.sismato.dto.snis.MunicipioAnoOverviewDTO;
+import br.unitins.hackathon.sismato.dto.snis.MunicipioAnoPrestadorDTO;
+import br.unitins.hackathon.sismato.dto.snis.MunicipioAnoGraficoDTO;
 import br.unitins.hackathon.sismato.repository.snis.AguaPrestadorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -77,4 +81,25 @@ public class AguaPrestadorService {
     }
 
     public Long countRegistros() { return repository.countRegistros(); }
+
+    public MunicipioAnoOverviewDTO getOverview(Long idMunicipio, Integer ano) {
+        return repository.getOverview(idMunicipio, resolveAno(ano));
+    }
+
+    public List<MunicipioAnoPrestadorDTO> getPrestadores(Long idMunicipio, Integer ano) {
+        return repository.getPrestadores(idMunicipio, resolveAno(ano));
+    }
+
+    public MunicipioAnoGraficoDTO getGrafico(Long idMunicipio, Integer ano) {
+        List<MunicipioAnoPrestadorDTO> prestadores = getPrestadores(idMunicipio, ano);
+        return new MunicipioAnoGraficoDTO(
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::prestador).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::populacaoAtendidaAgua).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::volumeAguaProduzido).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::indicePerdaDistribuicao).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::receitaOperacional).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::investimentoAgua).collect(Collectors.toList()),
+            prestadores.stream().map(MunicipioAnoPrestadorDTO::investimentoEsgoto).collect(Collectors.toList())
+        );
+    }
 }

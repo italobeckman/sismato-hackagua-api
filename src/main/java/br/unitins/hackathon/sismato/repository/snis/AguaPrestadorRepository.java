@@ -1,7 +1,10 @@
 package br.unitins.hackathon.sismato.repository.snis;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import br.unitins.hackathon.sismato.dto.snis.AtendimentoUrbanoMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.snis.DespesasPrestadorDTO;
@@ -10,6 +13,8 @@ import br.unitins.hackathon.sismato.dto.snis.EvolucaoEsgotoMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.snis.ExtensaoRedeUfDTO;
 import br.unitins.hackathon.sismato.dto.snis.InvestimentoNaturezaDTO;
 import br.unitins.hackathon.sismato.dto.snis.MediasIndicesAnoDTO;
+import br.unitins.hackathon.sismato.dto.snis.MunicipioAnoOverviewDTO;
+import br.unitins.hackathon.sismato.dto.snis.MunicipioAnoPrestadorDTO;
 import br.unitins.hackathon.sismato.dto.snis.PerdasDistribuicaoPrestadorDTO;
 import br.unitins.hackathon.sismato.dto.snis.RankingPopulacaoMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.snis.ReceitaOperacionalAnoDTO;
@@ -142,5 +147,47 @@ public class AguaPrestadorRepository implements PanacheRepository<AguaPrestador>
     public Long countRegistros() {
         String jpql = "select count(a) from AguaPrestador a";
         return getEntityManager().createQuery(jpql, Long.class).getSingleResult();
+    }
+
+    public MunicipioAnoOverviewDTO getOverview(Long idMunicipio, Integer ano) {
+        String jpql = "select new br.unitins.hackathon.sismato.dto.snis.MunicipioAnoOverviewDTO(" +
+                "a.idMunicipio, a.siglaUf, cast(a.ano as integer), " +
+                "sum(a.populacaoUrbana), sum(a.populacaoAtendidaAgua), sum(a.populacaoAtendidaEsgoto), " +
+                "sum(a.volumeAguaProduzido), sum(a.volumeEsgotoColetado), " +
+                "avg(a.indicePerdaDistribuicaoAgua), sum(a.receitaOperacional), " +
+                "sum(a.investimentoAguaPrestador), sum(a.investimentoEsgotoPrestador)" +
+                ") from AguaPrestador a where a.idMunicipio = :idMunicipio and a.ano = :ano " +
+                "group by a.idMunicipio, a.siglaUf, a.ano";
+        return getEntityManager().createQuery(jpql, MunicipioAnoOverviewDTO.class)
+                .setParameter("idMunicipio", idMunicipio)
+                .setParameter("ano", (long) ano)
+                .getSingleResult();
+    }
+
+    /**
+     * Retorna lista de prestadores com dados para um município e ano específicos
+     * GRÁFICO: Barras múltiplas - Comparação de indicadores por prestador
+     * INSIGHT: Desempenho individual dos prestadores no município
+     */
+    public List<MunicipioAnoPrestadorDTO> getPrestadores(Long idMunicipio, Integer ano) {
+        String sql = "SELECT a.prestador, a.populacao_atendida_agua, a.volume_agua_produzido, " +
+                "a.indice_perda_distribuicao_agua, a.receita_operacional, " +
+                "a.investimento_agua_prestador, a.investimento_esgoto_prestador " +
+                "FROM esgoto_agua_prestador_snis a " +
+                "WHERE a.id_municipio = :idMunicipio AND a.ano = :ano";
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("idMunicipio", idMunicipio);
+        query.setParameter("ano", ano);
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+        return rows.stream().map(r -> new MunicipioAnoPrestadorDTO(
+                (String) r[0],
+                r[1] != null ? ((Number) r[1]).doubleValue() : 0.0,
+                r[2] != null ? ((Number) r[2]).doubleValue() : 0.0,
+                r[3] != null ? ((Number) r[3]).doubleValue() : 0.0,
+                r[4] != null ? ((Number) r[4]).doubleValue() : 0.0,
+                r[5] != null ? ((Number) r[5]).doubleValue() : 0.0,
+                r[6] != null ? ((Number) r[6]).doubleValue() : 0.0
+        )).collect(Collectors.toList());
     }
 }

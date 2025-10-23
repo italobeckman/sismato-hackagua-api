@@ -3,6 +3,7 @@ package br.unitins.hackathon.sismato.resource.snis;
 import br.unitins.hackathon.sismato.dto.snis.*;
 import br.unitins.hackathon.sismato.service.snis.AguaPrestadorService;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -125,5 +126,26 @@ public class AguaPrestadorResource {
             @QueryParam("ano") Integer ano
     ) {
         return service.investimentosPorNatureza(ano);
+    }
+
+    @GET
+    @Path("/municipio-ano/overview")
+    public MunicipioAnoOverviewDTO overview(@QueryParam("ano") Integer ano, @QueryParam("idMunicipio") Long idMunicipio) {
+        if (idMunicipio == null) throw new BadRequestException("idMunicipio é obrigatório");
+        return service.getOverview(idMunicipio, ano);
+    }
+
+    @GET
+    @Path("/prestadores")
+    public List<MunicipioAnoPrestadorDTO> prestadores(@QueryParam("ano") Integer ano, @QueryParam("idMunicipio") Long idMunicipio) {
+        if (idMunicipio == null) throw new BadRequestException("idMunicipio é obrigatório");
+        return service.getPrestadores(idMunicipio, ano);
+    }
+
+    @GET
+    @Path("/municipio-ano/grafico")
+    public MunicipioAnoGraficoDTO grafico(@QueryParam("ano") Integer ano, @QueryParam("idMunicipio") Long idMunicipio) {
+        if (idMunicipio == null) throw new BadRequestException("idMunicipio é obrigatório");
+        return service.getGrafico(idMunicipio, ano);
     }
 }
