@@ -11,19 +11,15 @@ import jakarta.inject.Inject;
 import java.util.List;
 
 @ApplicationScoped
-public class ControleSemestralInorganicaService {
-    
+public class ControleSemestralInorganicaService
+        extends AbstractControleService<ControleSemestralInorganica, ControleSemestralInorganicaRepository> {
+
     @Inject
     ControleSemestralInorganicaRepository controleSemestralInorganicaRepository;
 
-     public List<ControleSemestralInorganica> findByCodigoMunicipio(Long codigoMunicipio, int page, int pageSize) {
-        return controleSemestralInorganicaRepository.findByMunicipio(codigoMunicipio).page(page, pageSize).list();
-    }
-
-    public List<ControleSemestralInorganica> findByFiltros(FilterBaseControle filtros, int page, int pageSize) {
-        return controleSemestralInorganicaRepository
-                .findByDataFiltros(filtros.codMunicipio(), filtros.anoReferencia(), filtros.semestreColeta(), filtros.mesColeta())
-                .page(page, pageSize)
-                .list();
+    @Override
+    protected ControleSemestralInorganicaRepository getRepository() {
+        return controleSemestralInorganicaRepository;
     }
 }
+

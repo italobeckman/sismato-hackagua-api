@@ -1,6 +1,8 @@
 package br.unitins.hackathon.sismato.resource.sisagua;
 
 import br.unitins.hackathon.sismato.dto.filters.FilterBaseControle;
+import br.unitins.hackathon.sismato.dto.sisagua.controlesemestral.ColetaAnualDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.controlesemestral.ColetaMensalDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.ControleSemestralAgrotoxico;
 import br.unitins.hackathon.sismato.service.sisagua.ControleSemestralAgrotoxicoService;
 import jakarta.inject.Inject;
@@ -32,5 +34,25 @@ public class ControleSemestralAgrotoxicoResource {
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
         return controleSemestralAgrotoxicoService.findByFiltros(filtros, page, pageSize);
+    }
+
+    @GET
+    @Path("/anual")
+    public ColetaAnualDTO findColetaAnualWithFilter(
+            @BeanParam FilterBaseControle filtros,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize
+    ) {
+        return controleSemestralAgrotoxicoService.findColetaAnualWithFilter(filtros, page, pageSize);
+    }
+
+    @GET
+    @Path("/mensal")
+    public ColetaMensalDTO findColetaMensalWithFilter(
+            @BeanParam FilterBaseControle filtros,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize
+    ) {
+        return controleSemestralAgrotoxicoService.findColetaMensalWithFilter(filtros, page, pageSize);
     }
 }
