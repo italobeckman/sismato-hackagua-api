@@ -1,88 +1,64 @@
-# sismato
+# SISMATO Hackágua — Back-end
+O SismaTO é uma plataforma centralizada e integrada, projetada para consolidar, analisar e disseminar dados e informações estratégicas sobre o saneamento básico e a qualidade da água no estado do Tocantins. O sistema visa aprimorar a gestão e a transparência dos serviços de abastecimento de água e esgotamento sanitário em toda a tocantinense.
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+<span>
+  <img src="https://img.shields.io/badge/Quarkus-4695EB?style=for-the-badge&logo=quarkus&logoColor=white" alt="Quarkus">
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/PostGIS-3E6E93?style=for-the-badge" alt="PostGIS">
+  <img src="https://img.shields.io/badge/pgAdmin-0083B3?style=for-the-badge" alt="pgAdmin">
+</span>
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+API e serviços de back-end do SISMATO, construídos com Quarkus e orquestrados via Docker Compose. Inclui banco de dados PostgreSQL (PostGIS) e pgAdmin para administração.
 
-## Running the application in dev mode
+## Tecnologias e versões
+- Quarkus `3.28.4` 
+- Java `21`
+- Maven Surefire/Failsafe `3.5.4`
+- Docker e Docker Compose
+- PostgreSQL/PostGIS: `postgis/postgis:latest`
+- pgAdmin: `dpage/pgadmin4:latest`
 
-You can run your application in dev mode that enables live coding using:
+Veja `pom.xml` e `docker-compose.dev.yml` para detalhes completos.
 
-```shell script
-./mvnw quarkus:dev
-```
+## Pré-requisitos
+- Linux ou Windows com WSL2 habilitado
+- Docker Desktop (com integração WSL habilitada) ou Docker em Linux
+- Docker Compose
+- GNU Make (`make`)
+- Opcional: Java 21 e Maven (para builds locais fora do Docker)
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## Como executar (dev)
+1. Após a clonagem do repositorio abra um terminal e navegue até o diretório do back-end:
+   ```bash
+   cd sismato-hackagua
+   ```
+2. Restaure o banco de desenvolvimento (usa Docker e um dump em `src/main/resources/sismato.dump`):
+   ```bash
+   make db-restore-dev
+   ```
+3. Suba o ambiente de desenvolvimento:
+   ```bash
+   make dev
+   ```
+4. Endpoints e serviços:
+   - API Quarkus: `http://localhost:8080`
+   - PostgreSQL (dev): `localhost:5432` (user: `root`, senha: `root`, db: `sismato`)
+   - pgAdmin (dev): `http://localhost:7001` (login: `root@root.com` / `root`)
 
-## Packaging and running the application
+## Alvos úteis do Makefile
+- `make dev-d`: sobe stack dev em background
+- `make dev-logs`: segue logs do stack dev
+- `make dev-down`: derruba stack dev
+- `make db-dump-dev`: gera dump do banco dev em `src/main/resources/`
+- `make prod`: stack de produção (foreground)
+- `make prod-d`: stack de produção (background)
+- `make prod-down`: derruba stack de produção
+- `make clean`: para tudo e remove volumes
 
-The application can be packaged using:
-
-```shell script
-./mvnw package
-```
-
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/sismato-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and
-  Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on
-  it.
-- REST Client ([guide](https://quarkus.io/guides/rest-client)): Call REST services
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus
-  REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code
-  for Hibernate ORM via the active record or the repository pattern
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-### REST Client
-
-Invoke different services through REST with JSON
-
-[Related guide section...](https://quarkus.io/guides/rest-client)
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+## Observações
+- O `docker-compose.dev.yml` mapeia `8080:8080` para a API, `5432:5432` para Postgres e `7001:80` para o pgAdmin.
+- Se usar Windows, execute os comandos dentro de um terminal WSL (Ubuntu, Debian, etc.).
+- Garanta que o Docker Desktop esteja com a integração WSL habilitada e o engine rodando.
