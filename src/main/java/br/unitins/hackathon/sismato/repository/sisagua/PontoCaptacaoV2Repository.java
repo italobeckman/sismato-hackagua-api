@@ -9,6 +9,7 @@ import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
+import br.unitins.hackathon.sismato.dto.MapaPontosCaptacaoComAmostrasDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -176,6 +177,75 @@ public class PontoCaptacaoV2Repository implements PanacheRepository<PontoCaptaca
         return rows.stream().map(r -> new TipoCaptacaoDTO(
                 (String) r[0],
                 ((Number) r[1]).longValue()
+        )).collect(Collectors.toList());
+    }
+
+    /**
+     * Retorna dados geoespaciais de pontos de captação com informações de amostras mensais
+     * Faz JOIN entre pontos_de_captacao_sisagua_v2 e mensal_amostras_sisagua
+     * GRÁFICO: Mapa com marcadores - Pontos de captação com tooltips ricos de qualidade da água
+     * INSIGHT: Visualização geográfica integrada de infraestrutura e qualidade da água
+     */
+    public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostras(Integer codIbge, Integer ano) {
+        String sql = """
+            SELECT
+                COALESCE(pc.nu_solucao_abastecimento, '') as codigo_ponto,
+                COALESCE(pc.no_ponto_captacao, '') as nome_ponto,
+                CAST(NULLIF(pc.nu_latitude, '') AS DECIMAL) as latitude,
+                CAST(NULLIF(pc.nu_longitude, '') AS DECIMAL) as longitude,
+                COALESCE(pc.tp_captacao, '') as tipo_captacao,
+                COALESCE(pc.st_outorga, '') as status_outorga,
+                COALESCE(pc.no_instituicao, '') as nome_instituicao,
+                COALESCE(pc.no_eta, '') as nome_eta,
+                pc.nu_vazao_captada as vazao_captada,
+                COALESCE(SUM(ma.num_amostras_analisadas), 0) as total_amostras,
+                COALESCE(SUM(ma.num_amostras_fora_do_padrao), 0) as amostras_inconformes,
+                CASE
+                    WHEN SUM(ma.num_amostras_analisadas) > 0
+                    THEN ROUND((SUM(ma.num_amostras_fora_do_padrao) * 100.0 / SUM(ma.num_amostras_analisadas)), 2)
+                    ELSE 0.0
+                END as percentual_inconformidade,
+                COALESCE(pc.no_municipio, '') as municipio,
+                pc.co_municipio_ibge as codigo_ibge,
+                pc.nu_ano as ano
+            FROM pontos_de_captacao_sisagua_v2 pc
+            LEFT JOIN mensal_amostras_sisagua ma ON pc.nu_solucao_abastecimento = ma.codigo_nome_saa_sac
+                AND pc.nu_ano = ma.ano
+                AND pc.co_municipio_ibge = ma.cod_mun_ibge::integer
+            WHERE pc.sg_uf = 'TO'
+                AND pc.co_municipio_ibge = :codIbge
+                AND pc.nu_ano = :ano
+                AND NULLIF(pc.nu_latitude, '') IS NOT NULL
+                AND NULLIF(pc.nu_longitude, '') IS NOT NULL
+            GROUP BY pc.nu_solucao_abastecimento, pc.no_ponto_captacao, pc.nu_latitude,
+                     pc.nu_longitude, pc.tp_captacao, pc.st_outorga, pc.no_instituicao,
+                     pc.no_eta, pc.nu_vazao_captada, pc.no_municipio, pc.co_municipio_ibge, pc.nu_ano
+            ORDER BY pc.nu_solucao_abastecimento
+            """;
+
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("codIbge", codIbge);
+        query.setParameter("ano", ano);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        return rows.stream().map(r -> new MapaPontosCaptacaoComAmostrasDTO(
+            r[0] != null ? r[0].toString() : "",                    // codigoPontoCaptacao
+            r[1] != null ? r[1].toString() : "",                    // nomePontoCaptacao
+            (java.math.BigDecimal) r[2],                           // latitude
+            (java.math.BigDecimal) r[3],                           // longitude
+            r[4] != null ? r[4].toString() : "",                    // tipoCaptacao
+            r[5] != null ? r[5].toString() : "",                    // statusOutorga
+            r[6] != null ? r[6].toString() : "",                    // nomeInstituicao
+            r[7] != null ? r[7].toString() : "",                    // nomeEta
+            (java.math.BigDecimal) r[8],                           // vazaoCaptada
+            ((Number) r[9]).longValue(),                           // totalAmostras
+            ((Number) r[10]).longValue(),                          // amostrasInconformes
+            ((Number) r[11]).doubleValue(),                        // percentualInconformidade
+            r[12] != null ? r[12].toString() : "",                 // municipio
+            ((Number) r[13]).intValue(),                           // codigoIbge
+            ((Number) r[14]).intValue()                            // ano
         )).collect(Collectors.toList());
     }
 }

@@ -6,6 +6,7 @@ import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoDetalhesDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
+import br.unitins.hackathon.sismato.dto.MapaPontosCaptacaoComAmostrasDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.PontoCaptacaoV2;
 import br.unitins.hackathon.sismato.repository.sisagua.PontoCaptacaoV2Repository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -74,5 +75,14 @@ public class PontoCaptacaoV2Service {
      */
     public List<TipoCaptacaoDTO> quantidadePorTipoCaptacao(Integer ano, Integer codigoIbge) {
         return repository.quantidadePorTipoCaptacao(ano, codigoIbge);
+    }
+
+    /**
+     * Retorna dados geoespaciais de pontos de captação com informações de qualidade da água
+     * GRÁFICO: Mapa com marcadores - Pontos de captação com tooltips ricos de qualidade da água
+     * INSIGHT: Visualização geográfica integrada de infraestrutura e qualidade da água
+     */
+    public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostras(Integer codIbge, Integer ano) {
+        return repository.mapaPontosComAmostras(codIbge, ano);
     }
 }

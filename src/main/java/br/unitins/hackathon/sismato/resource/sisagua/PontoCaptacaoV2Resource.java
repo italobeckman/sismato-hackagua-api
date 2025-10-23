@@ -6,6 +6,7 @@ import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoVazaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.PontoCaptacaoMapaDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TipoCaptacaoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TotalOutorgaDTO;
+import br.unitins.hackathon.sismato.dto.MapaPontosCaptacaoComAmostrasDTO;
 import br.unitins.hackathon.sismato.service.sisagua.PontoCaptacaoV2Service;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -138,5 +139,29 @@ public class PontoCaptacaoV2Resource {
             @QueryParam("ano") @DefaultValue("2025") Integer ano,
             @QueryParam("codIbge") Integer codIbge) {
         return service.quantidadePorTipoCaptacao(ano, codIbge);
+    }
+
+    /**
+     * Dados geoespaciais de pontos de captação com informações de qualidade da água.
+     * Faz JOIN entre pontos de captação e amostras mensais para fornecer dados integrados.
+     *
+     * Query params:
+     * - codIbge: código IBGE do município (obrigatório, ex.: 1721000)
+     * - ano: ano de referência (obrigatório, ex.: 2025)
+     *
+     * Ideal para mapa interativo no Highcharts:
+     * - latitude/longitude: coordenadas geográficas
+     * - tooltips ricos: nome do ponto, tipo de captação, vazão, qualidade da água
+     * - marcadores coloridos: baseados no percentual de inconformidade
+     *
+     * INSIGHT: Visualização geográfica integrada que combina infraestrutura
+     * com dados de qualidade da água para análise espacial da situação hídrica
+     */
+    @GET
+    @Path("/mapa-com-amostras")
+    public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostras(
+            @QueryParam("codIbge") Integer codIbge,
+            @QueryParam("ano") Integer ano) {
+        return service.mapaPontosComAmostras(codIbge, ano);
     }
 }
