@@ -20,8 +20,12 @@ API e serviços de back-end do SISMATO, construídos com Quarkus e orquestrados 
 - Docker e Docker Compose
 - PostgreSQL/PostGIS: `postgis/postgis:latest`
 - pgAdmin: `dpage/pgadmin4:latest`
-
 Veja `pom.xml` e `docker-compose.dev.yml` para detalhes completos.
+
+## Estrutura do DB
+
+[Diagrama do Banco de Dados - Visão Geral](https://drive.google.com/drive/folders/1HPP7n4gRl92ffoZcgtCdg4tkfnRVgddx?usp=sharing)
+Recomendando o download da imagem para melhor visualização!
 
 ## Pré-requisitos
 - Linux ou Windows com WSL2 habilitado
