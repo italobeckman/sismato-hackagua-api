@@ -68,7 +68,14 @@ public abstract class AbstractControleRepository<T> implements PanacheRepository
                 .setParameter("ano", ano)
                 .setParameter("municipio", codigoMunicipio);
 
-        return (ColetaAnualDTO) query.getSingleResult();
+        try {
+            ColetaAnualDTO coletAnualDTO = (ColetaAnualDTO) query.getSingleResult();
+            coletAnualDTO.setAno(ano);
+
+            return coletAnualDTO;
+        } catch (Exception e) {
+            return new ColetaAnualDTO(0, 0L, 0L, 0L, 0L, 0L, 0L);
+        }
     }
 
     public ColetaMensalDTO findMensalWithFilter(
@@ -105,10 +112,14 @@ public abstract class AbstractControleRepository<T> implements PanacheRepository
                 .setParameter("mes", mes.trim())
                 .setParameter("municipio", codigoMunicipio);
 
-        ColetaMensalDTO coletaMensalDTO = (ColetaMensalDTO) query.getSingleResult();
-        coletaMensalDTO.setAno(ano);
+        try {
+            ColetaMensalDTO coletaMensalDTO = (ColetaMensalDTO) query.getSingleResult();
+            coletaMensalDTO.setAno(ano);
 
-        return coletaMensalDTO;
+            return coletaMensalDTO;
+        } catch (Exception e) {
+            return new ColetaMensalDTO("Janeiro", 0L, 0L, 0L, 0L, 0L, 0L);
+        }
     }
 
     public PanacheQuery<T> findByDataFiltros(

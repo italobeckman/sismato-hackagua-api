@@ -7,19 +7,19 @@ public class ColetaAnualDTO {
     private Long qtdCaptcaoSubterranea;
     private Long qtdCaptacaoAguaChuva;
     private Long qtdAreaUrbana;
-    private Long qtdAreaRura;
+    private Long qtdAreaRural;
 
     public ColetaAnualDTO() {
     }
 
-    public ColetaAnualDTO(Integer ano, Long qtdTotal, Long qtdCaptacaoSuperficial, Long qtdCaptcaoSubterranea, Long qtdCaptacaoAguaChuva, Long qtdAreaUrbana, Long qtdAreaRura) {
+    public ColetaAnualDTO(Integer ano, Long qtdTotal, Long qtdCaptacaoSuperficial, Long qtdCaptcaoSubterranea, Long qtdCaptacaoAguaChuva, Long qtdAreaUrbana, Long qtdAreaRural) {
         this.ano = ano;
         this.qtdTotal = qtdTotal;
         this.qtdCaptacaoSuperficial = qtdCaptacaoSuperficial;
         this.qtdCaptcaoSubterranea = qtdCaptcaoSubterranea;
         this.qtdCaptacaoAguaChuva = qtdCaptacaoAguaChuva;
         this.qtdAreaUrbana = qtdAreaUrbana;
-        this.qtdAreaRura = qtdAreaRura;
+        this.qtdAreaRural = qtdAreaRural;
     }
 
     public Integer getAno() {
@@ -70,11 +70,11 @@ public class ColetaAnualDTO {
         this.qtdAreaUrbana = qtdAreaUrbana;
     }
 
-    public Long getQtdAreaRura() {
-        return qtdAreaRura;
+    public Long getQtdAreaRural() {
+        return qtdAreaRural;
     }
 
-    public void setQtdAreaRura(Long qtdAreaRura) {
-        this.qtdAreaRura = qtdAreaRura;
+    public void setQtdAreaRural(Long qtdAreaRural) {
+        this.qtdAreaRural = qtdAreaRural;
     }
 }
