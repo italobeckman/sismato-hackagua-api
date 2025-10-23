@@ -6,7 +6,6 @@ import java.util.List;
 import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoQualidadeMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.MensalAmostrasResumoPorAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.ParametroCriticoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.ParametrosCriticosMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.QualidadeAguaMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
@@ -96,10 +95,6 @@ public class MensalAmostrasService {
         return repository.serieTemporalPorMunicipioParametrosTO(codIbge, filtrados);
     }
 
-    public List<ParametroCriticoDTO> topParametrosAnoAnteriorTO(int limit) {
-        return repository.topParametrosAnoAnteriorTO(limit);
-    }
-
     /**
      * Retorna a qualidade da água por município específico em um ano
      */
@@ -117,8 +112,8 @@ public class MensalAmostrasService {
     /**
      * Retorna os parâmetros mais críticos por município em um ano
      */
-    public List<ParametrosCriticosMunicipioDTO> parametrosCriticosPorMunicipio(String codIbge, Integer ano, int limit) {
-        return repository.parametrosCriticosPorMunicipio(codIbge, ano, limit);
+    public List<ParametrosCriticosMunicipioDTO> parametrosCriticosPorMunicipio(String codIbge, Integer ano) {
+        return repository.parametrosCriticosPorMunicipio(codIbge, ano);
     }
 
     /**

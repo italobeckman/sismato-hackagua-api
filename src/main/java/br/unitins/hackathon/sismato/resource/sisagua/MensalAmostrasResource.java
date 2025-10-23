@@ -3,7 +3,6 @@ package br.unitins.hackathon.sismato.resource.sisagua;
 import java.util.List;
 
 import br.unitins.hackathon.sismato.dto.sisagua.MensalAmostrasResumoPorAnoDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.ParametroCriticoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
@@ -84,13 +83,6 @@ public class MensalAmostrasResource {
         return service.serieTemporalPorMunicipioParametrosTO(codIbge, parametros);
     }
 
-    @GET
-    @Path("/top-parametros-ano-anterior")
-    public List<ParametroCriticoDTO> topParametrosAnoAnterior(
-            @QueryParam("limit") @DefaultValue("10") int limit) {
-        return service.topParametrosAnoAnteriorTO(limit);
-    }
-
     /**
      * Qualidade da água por município específico em um ano.
      * GRÁFICO: Pizza/Donut - Distribuição de conformidade/inconformidade
@@ -137,9 +129,9 @@ public class MensalAmostrasResource {
     @Path("/parametros-criticos-municipio")
     public List<ParametrosCriticosMunicipioDTO> parametrosCriticosPorMunicipio(
             @QueryParam("codIbge") String codIbge,
-            @QueryParam("ano") @DefaultValue("2025") Integer ano,
-            @QueryParam("limit") @DefaultValue("10") int limit) {
-        return service.parametrosCriticosPorMunicipio(codIbge, ano, limit);
+            @QueryParam("ano") @DefaultValue("2025") Integer ano
+    ) {
+        return service.parametrosCriticosPorMunicipio(codIbge, ano);
     }
 
     /**
