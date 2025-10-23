@@ -164,4 +164,121 @@ public class PontoCaptacaoV2Resource {
             @QueryParam("ano") Integer ano) {
         return service.mapaPontosComAmostras(codIbge, ano);
     }
+
+    /**
+     * Busca pontos de captação por estado (UF).
+     * Retorna todos os pontos do estado especificado.
+     *
+     * Query params:
+     * - uf: sigla do estado (ex.: TO)
+     * - ano: ano de referência (ex.: 2025)
+     * - page: página (padrão: 0)
+     * - pageSize: tamanho da página (padrão: 1000)
+     *
+     * Ideal para carregamento inicial do estado completo
+     */
+    @GET
+    @Path("/estado/{uf}")
+    public Response getByEstado(
+            @PathParam("uf") String uf,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("1000") int pageSize) {
+        var items = service.findByEstado(uf, ano, page, pageSize);
+        return Response.ok(items.stream().map(PontoCaptacaoMapaDTO::toDto).toList()).build();
+    }
+
+    /**
+     * Detalhes consolidados por estado.
+     * Retorna estatísticas agregadas de todos os pontos do estado.
+     *
+     * Query params:
+     * - uf: sigla do estado (ex.: TO)
+     * - ano: ano de referência (ex.: 2025)
+     *
+     * Retorna totais de pontos, tipos de captação e status de outorga para o estado
+     */
+    @GET
+    @Path("/detalhes-estado/{uf}")
+    public Response getDetalhesEstado(
+            @PathParam("uf") String uf,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano) {
+        var detalhes = service.getDetalhesEstado(uf, ano);
+        return Response.ok(detalhes).build();
+    }
+
+    /**
+     * Evolução histórica das vazões por estado.
+     * Retorna a vazão média e quantidade de pontos por ano para todo o estado.
+     *
+     * Query params:
+     * - uf: sigla do estado (ex.: TO)
+     *
+     * Ideal para gráfico de linha/área no Highcharts:
+     * - Eixo X: ano
+     * - Eixo Y: vazaoMedia
+     * - Série adicional: quantidadePontos
+     */
+    @GET
+    @Path("/evolucao-vazoes-estado")
+    public List<EvolucaoVazaoDTO> evolucaoVazoesPorEstado(
+            @QueryParam("uf") String uf) {
+        return service.evolucaoVazoesPorEstado(uf);
+    }
+
+    /**
+     * Total de pontos por status de outorga por estado.
+     *
+     * Query params:
+     * - uf: sigla do estado (ex.: TO)
+     * - ano: ano de referência (ex.: 2025)
+     *
+     * Ideal para gráfico de pizza/donut no Highcharts
+     */
+    @GET
+    @Path("/total-outorga-estado")
+    public List<TotalOutorgaDTO> totalPorOutorgaEstado(
+            @QueryParam("uf") String uf,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano) {
+        return service.totalPorOutorgaEstado(uf, ano);
+    }
+
+    /**
+     * Quantidade de pontos por tipo de captação por estado.
+     *
+     * Query params:
+     * - uf: sigla do estado (ex.: TO)
+     * - ano: ano de referência (ex.: 2025)
+     *
+     * Ideal para gráfico de coluna/barra no Highcharts
+     */
+    @GET
+    @Path("/tipo-captacao-estado")
+    public List<TipoCaptacaoDTO> quantidadePorTipoCaptacaoEstado(
+            @QueryParam("uf") String uf,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano) {
+        return service.quantidadePorTipoCaptacaoEstado(uf, ano);
+    }
+
+    /**
+     * Dados geoespaciais filtrados de pontos de captação com informações de qualidade da água.
+     * Filtros opcionais: tipo de captação, status de outorga, faixa de vazão e percentual de inconformidade.
+     */
+    @GET
+    @Path("/mapa-com-amostras-filtrado")
+    public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostrasFiltrado(
+            @QueryParam("codIbge") Integer codIbge,
+            @QueryParam("ano") Integer ano,
+            @QueryParam("tipoCaptacao") String tipoCaptacao,
+            @QueryParam("statusOutorga") String statusOutorga,
+            @QueryParam("minVazao") Double minVazao,
+            @QueryParam("maxVazao") Double maxVazao,
+            @QueryParam("minInconformidade") Double minInconformidade,
+            @QueryParam("maxInconformidade") Double maxInconformidade
+    ) {
+        return service.mapaPontosComAmostrasFiltrado(
+                codIbge, ano, tipoCaptacao, statusOutorga,
+                minVazao, maxVazao, minInconformidade, maxInconformidade
+        );
+    }
 }

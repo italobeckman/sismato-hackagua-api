@@ -1,4 +1,5 @@
 package br.unitins.hackathon.sismato.service.sisagua;
+import br.unitins.hackathon.sismato.dto.sisagua.ResumoPontoAmostrasDTO;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,8 +67,16 @@ public class MensalAmostrasService {
         return repository.rankingMunicipiosGeralTO(minAmostras, limit);
     }
 
+    public List<RankingMunicipioDTO> rankingMunicipiosGeralPorUf(String uf, int minAmostras, int limit) {
+        return repository.rankingMunicipiosGeralPorUf(uf, minAmostras, limit);
+    }
+
     public List<RankingMunicipioAnoDTO> rankingMunicipiosPorAnoTO(int minAmostras, int limit) {
         return repository.rankingMunicipiosPorAnoTO(minAmostras, limit);
+    }
+
+    public List<RankingMunicipioAnoDTO> rankingMunicipiosPorAnoPorUf(String uf, int minAmostras, int limit) {
+        return repository.rankingMunicipiosPorAnoPorUf(uf, minAmostras, limit);
     }
 
     public List<TimeSeriesParametroDTO> serieTemporalPorMunicipioParametrosTO(String codIbge, List<String> parametros) {
@@ -123,4 +132,7 @@ public class MensalAmostrasService {
         return repository.comparacaoMunicipiosPorRegiao(regiao, ano, minAmostras, limit);
     }
 
+    public List<ResumoPontoAmostrasDTO> resumoPorPontoAnoTO(String codIbge, Integer ano) {
+        return repository.resumoPorPontoAnoTO(codIbge, ano);
+    }
 }

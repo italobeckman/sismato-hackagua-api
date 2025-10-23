@@ -1,4 +1,5 @@
 package br.unitins.hackathon.sismato.repository.sisagua;
+import br.unitins.hackathon.sismato.dto.sisagua.ResumoPontoAmostrasDTO;
 
 import br.unitins.hackathon.sismato.entity.sisagua.MensalAmostras;
 import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
@@ -121,6 +122,59 @@ public class MensalAmostrasRepository implements PanacheRepository<MensalAmostra
                 "HAVING SUM(num_amostras_analisadas) > :min " +
                 "ORDER BY percentual_inconformidade_anual DESC";
         var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("min", minAmostras);
+        query.setMaxResults(limit);
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+        return rows.stream().map(r -> new RankingMunicipioAnoDTO(
+                ((Number) r[0]).intValue(),
+                (String) r[1],
+                r[2] != null ? r[2].toString() : null,
+                ((Number) r[3]).longValue(),
+                ((Number) r[4]).longValue(),
+                ((Number) r[5]).doubleValue()
+        )).collect(Collectors.toList());
+    }
+
+    public List<RankingMunicipioDTO> rankingMunicipiosGeralPorUf(String uf, int minAmostras, int limit) {
+        String sql = "SELECT municipio, cod_mun_ibge, " +
+                "SUM(num_amostras_analisadas) AS total_amostras_analisadas, " +
+                "SUM(num_amostras_fora_do_padrao) AS total_amostras_inconformes, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "(SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)) ELSE 0 END AS percentual_inconformidade_geral " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = :uf AND ano IS NOT NULL AND mes_referencia IS NOT NULL " +
+                "GROUP BY municipio, cod_mun_ibge " +
+                "HAVING SUM(num_amostras_analisadas) > :min " +
+                "ORDER BY percentual_inconformidade_geral DESC";
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("uf", uf);
+        query.setParameter("min", minAmostras);
+        query.setMaxResults(limit);
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+        return rows.stream().map(r -> new RankingMunicipioDTO(
+                (String) r[0],
+                r[1] != null ? r[1].toString() : null,
+                ((Number) r[2]).longValue(),
+                ((Number) r[3]).longValue(),
+                ((Number) r[4]).doubleValue()
+        )).collect(Collectors.toList());
+    }
+
+    public List<RankingMunicipioAnoDTO> rankingMunicipiosPorAnoPorUf(String uf, int minAmostras, int limit) {
+        String sql = "SELECT ano, municipio, cod_mun_ibge, " +
+                "SUM(num_amostras_analisadas) AS total_amostras_analisadas, " +
+                "SUM(num_amostras_fora_do_padrao) AS total_amostras_inconformes, " +
+                "CASE WHEN SUM(num_amostras_analisadas) > 0 THEN " +
+                "(SUM(num_amostras_fora_do_padrao) * 100.0 / SUM(num_amostras_analisadas)) ELSE 0 END AS percentual_inconformidade_anual " +
+                "FROM public.mensal_amostras_sisagua " +
+                "WHERE uf = :uf AND ano IS NOT NULL AND mes_referencia IS NOT NULL " +
+                "GROUP BY ano, municipio, cod_mun_ibge " +
+                "HAVING SUM(num_amostras_analisadas) > :min " +
+                "ORDER BY percentual_inconformidade_anual DESC";
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("uf", uf);
         query.setParameter("min", minAmostras);
         query.setMaxResults(limit);
         @SuppressWarnings("unchecked")
@@ -322,5 +376,30 @@ public class MensalAmostrasRepository implements PanacheRepository<MensalAmostra
                 ((Number) r[3]).longValue(),
                 ((Number) r[4]).intValue()
         )).collect(Collectors.toList());
+    }
+    public List<ResumoPontoAmostrasDTO> resumoPorPontoAnoTO(String codIbge, Integer ano) {
+        String sql = "SELECT " +
+                "ma.codigo_nome_saa_sac AS codigo_ponto, " +
+                "SUM(ma.num_amostras_analisadas) AS total_amostras, " +
+                "SUM(ma.num_amostras_fora_do_padrao) AS amostras_inconformes, " +
+                "CASE WHEN SUM(ma.num_amostras_analisadas) > 0 THEN " +
+                "ROUND((SUM(ma.num_amostras_fora_do_padrao) * 100.0 / SUM(ma.num_amostras_analisadas)), 2) ELSE NULL END AS percentual_inconformidade, " +
+                "ma.ano, ma.cod_mun_ibge::integer AS cod_ibge " +
+                "FROM public.mensal_amostras_sisagua ma " +
+                "WHERE ma.uf = 'TO' AND ma.cod_mun_ibge = :codIbge AND ma.ano = :ano " +
+                "GROUP BY ma.codigo_nome_saa_sac, ma.ano, ma.cod_mun_ibge";
+        var query = getEntityManager().createNativeQuery(sql);
+        query.setParameter("codIbge", codIbge);
+        query.setParameter("ano", ano);
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+        return rows.stream().map(r -> new ResumoPontoAmostrasDTO(
+                r[0] != null ? r[0].toString().trim() : "",
+                ((Number) r[1]).longValue(),
+                ((Number) r[2]).longValue(),
+                r[3] != null ? ((Number) r[3]).doubleValue() : null,
+                ((Number) r[4]).intValue(),
+                ((Number) r[5]).intValue()
+        )).collect(java.util.stream.Collectors.toList());
     }
 }

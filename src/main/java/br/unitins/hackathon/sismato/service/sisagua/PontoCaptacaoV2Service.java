@@ -85,4 +85,63 @@ public class PontoCaptacaoV2Service {
     public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostras(Integer codIbge, Integer ano) {
         return repository.mapaPontosComAmostras(codIbge, ano);
     }
+
+    // ========== MÉTODOS PARA BUSCA POR ESTADO ==========
+
+    /**
+     * Busca pontos de captação por estado (UF)
+     */
+    public List<PontoCaptacaoV2> findByEstado(String uf, Integer ano, int page, int pageSize) {
+        var q = repository.findByEstado(uf, ano);
+        q.page(page, pageSize);
+        q.withHint("org.hibernate.fetchSize", Math.min(pageSize, 1000));
+        return q.list();
+    }
+
+    /**
+     * Retorna detalhes consolidados por estado
+     */
+    public PontoCaptacaoDetalhesDTO getDetalhesEstado(String uf, Integer ano) {
+        return repository.getDetalhesEstado(uf, ano);
+    }
+
+    /**
+     * Retorna a evolução histórica das vazões por estado
+     */
+    public List<EvolucaoVazaoDTO> evolucaoVazoesPorEstado(String uf) {
+        return repository.evolucaoVazoesPorEstado(uf);
+    }
+
+    /**
+     * Retorna o total de pontos com outorga por estado
+     */
+    public List<TotalOutorgaDTO> totalPorOutorgaEstado(String uf, Integer ano) {
+        return repository.totalPorOutorgaEstado(uf, ano);
+    }
+
+    /**
+     * Retorna a quantidade de pontos por tipo de captação por estado
+     */
+    public List<TipoCaptacaoDTO> quantidadePorTipoCaptacaoEstado(String uf, Integer ano) {
+        return repository.quantidadePorTipoCaptacaoEstado(uf, ano);
+    }
+
+    /**
+     * Retorna dados geoespaciais de pontos com amostras, com filtros opcionais.
+     */
+    public List<MapaPontosCaptacaoComAmostrasDTO> mapaPontosComAmostrasFiltrado(
+            Integer codIbge,
+            Integer ano,
+            String tipoCaptacao,
+            String statusOutorga,
+            Double minVazao,
+            Double maxVazao,
+            Double minInconformidade,
+            Double maxInconformidade
+    ) {
+        return repository.mapaPontosComAmostrasFiltrado(
+                codIbge, ano, tipoCaptacao, statusOutorga,
+                minVazao, maxVazao, minInconformidade, maxInconformidade
+        );
+    }
 }

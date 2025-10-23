@@ -1,15 +1,17 @@
 package br.unitins.hackathon.sismato.resource.sisagua;
+import br.unitins.hackathon.sismato.dto.sisagua.ResumoPontoAmostrasDTO;
 
 import java.util.List;
 
+import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoQualidadeMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.MensalAmostrasResumoPorAnoDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.ParametrosCriticosMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.QualidadeAguaMunicipioDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioAnoDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.RankingMunicipioDTO;
+import br.unitins.hackathon.sismato.dto.sisagua.ResumoPontoAmostrasDTO;
 import br.unitins.hackathon.sismato.dto.sisagua.TimeSeriesParametroDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.QualidadeAguaMunicipioDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.EvolucaoQualidadeMunicipioDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.ParametrosCriticosMunicipioDTO;
-import br.unitins.hackathon.sismato.dto.sisagua.ComparacaoMunicipiosDTO;
 import br.unitins.hackathon.sismato.entity.sisagua.MensalAmostras;
 import br.unitins.hackathon.sismato.service.sisagua.MensalAmostrasService;
 import jakarta.inject.Inject;
@@ -36,26 +38,37 @@ public class MensalAmostrasResource {
     // percentual de inconformidade geral por municipio anualmente
     @GET
     @Path("/resumo-ano")
-    public List<MensalAmostrasResumoPorAnoDTO> resumoPorAno() {
-        return service.resumoPorAnoPorUf("TO");
+    public List<MensalAmostrasResumoPorAnoDTO> resumoPorAno(
+            @QueryParam("uf") @DefaultValue("TO") String uf) {
+        return service.resumoPorAnoPorUf(uf);
     }
 
     // maiores indices de percentualInconformidadeGeral
     @GET
     @Path("/ranking-municipios")
     public List<RankingMunicipioDTO> rankingMunicipios(
+            @QueryParam("uf") String uf,
             @QueryParam("minAmostras") @DefaultValue("100") int minAmostras,
             @QueryParam("limit") @DefaultValue("20") int limit) {
-        return service.rankingMunicipiosGeralTO(minAmostras, limit);
+        if (uf != null && !uf.isEmpty()) {
+            return service.rankingMunicipiosGeralPorUf(uf, minAmostras, limit);
+        } else {
+            return service.rankingMunicipiosGeralTO(minAmostras, limit);
+        }
     }
 
     // percentual inconformidade anual por municipio
     @GET
     @Path("/ranking-municipios-por-ano")
     public List<RankingMunicipioAnoDTO> rankingMunicipiosPorAno(
+            @QueryParam("uf") String uf,
             @QueryParam("minAmostras") @DefaultValue("100") int minAmostras,
             @QueryParam("limit") @DefaultValue("20") int limit) {
-        return service.rankingMunicipiosPorAnoTO(minAmostras, limit);
+        if (uf != null && !uf.isEmpty()) {
+            return service.rankingMunicipiosPorAnoPorUf(uf, minAmostras, limit);
+        } else {
+            return service.rankingMunicipiosPorAnoTO(minAmostras, limit);
+        }
     }
 
     @GET
@@ -153,5 +166,17 @@ public class MensalAmostrasResource {
             @QueryParam("minAmostras") @DefaultValue("100") int minAmostras,
             @QueryParam("limit") @DefaultValue("20") int limit) {
         return service.comparacaoMunicipiosPorRegiao(regiao, ano, minAmostras, limit);
+    }
+    
+    @GET
+    @Path("/resumo-pontos-ano")
+    public List<ResumoPontoAmostrasDTO> resumoPontosPorAno(
+            @QueryParam("codIbge") String codIbge,
+            @QueryParam("ano") @DefaultValue("2025") Integer ano
+    ) {
+        return service.resumoPorPontoAnoTO(codIbge, ano)
+                .stream()
+                .map(obj -> (ResumoPontoAmostrasDTO) obj)
+                .toList();
     }
 }
