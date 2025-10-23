@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 public record MapaPontosCaptacaoComAmostrasDTO(
     String codigoPontoCaptacao,
     String nomePontoCaptacao,
-    BigDecimal latitude,
-    BigDecimal longitude,
+    BigDecimal nuLatitude,
+    BigDecimal nuLongitude,
     String tipoCaptacao,
     String statusOutorga,
     String nomeInstituicao,
